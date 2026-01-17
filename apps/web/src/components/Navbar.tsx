@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import LogOutBtn from "./auth/LogOutBtn";
-
+//TODO: copy research agent folder into proj and link
 export default async function Navbar() {
   const session = await auth();
   const user = session?.user;
