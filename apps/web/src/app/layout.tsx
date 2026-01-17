@@ -25,8 +25,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <SessionProvider>
-          <Navbar />
-          <NuqsAdapter>{children}</NuqsAdapter>
+          <NuqsAdapter>
+            <Navbar />
+            {children}
+          </NuqsAdapter>
         </SessionProvider>
       </body>
     </html>

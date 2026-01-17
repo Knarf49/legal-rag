@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
+import { AgentSelector } from "../AgentSelector";
 // import { GitHubSVG } from "../icons/github";
 import {
   Tooltip,
@@ -414,7 +415,7 @@ export function Thread() {
                     />
 
                     <div className="flex items-center justify-between p-2 pt-4">
-                      <div>
+                      <div className="flex items-center gap-4">
                         <div className="flex items-center space-x-2">
                           <Switch
                             id="render-tool-calls"
@@ -428,6 +429,8 @@ export function Thread() {
                             Hide Tool Calls
                           </Label>
                         </div>
+                        <div className="w-px h-6 bg-gray-300"></div>
+                        <AgentSelector />
                       </div>
                       {stream.isLoading ? (
                         <Button key="stop" onClick={() => stream.stop()}>
