@@ -17,7 +17,6 @@ import {
   ensureIndexConfiguration,
   IndexConfigurationAnnotation,
 } from "./configuration.js";
-import { auth } from "../../../web/src/lib/auth/auth-node.js";
 
 function ensureDocsHaveUserId(docs: Document[], userId: string): Document[] {
   return docs.map((doc) => {
@@ -87,12 +86,8 @@ async function indexDocs(
     throw new Error("ConfigurationAnnotation required to run index_docs.");
   }
 
-  // Get userId from NextAuth session
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("User must be authenticated. userId not found in session.");
-  }
-  const userId = session.user.id;
+  // Use userId from config metadata or default to 'default'
+  const userId = config.metadata?.userId || "default";
 
   const docs = state.docs;
   const configuration = ensureIndexConfiguration(config);
