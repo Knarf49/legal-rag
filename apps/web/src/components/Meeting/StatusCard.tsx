@@ -6,7 +6,7 @@ import {
   CardFooter,
   CardTitle,
 } from "../ui/card";
-import { AlertTriangle, ArrowRightIcon, CheckCircle } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import { Separator } from "../ui/separator";
 
 type StatusCardProps = {
