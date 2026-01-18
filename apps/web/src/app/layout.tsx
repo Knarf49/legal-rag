@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Inter } from "next/font/google";
+import { Inter, Roboto } from "next/font/google";
+
 import React from "react";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { SessionProvider } from "next-auth/react";
 import Navbar from "@/components/Navbar";
-const inter = Inter({
+import MobileNav from "@/components/MobileNav";
+
+const roboto = Roboto({
   subsets: ["latin"],
   preload: true,
   display: "swap",
 });
-
 export const metadata: Metadata = {
   title: "Agent Inbox",
   description: "Agent Inbox UX by LangChain",
@@ -23,11 +25,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={roboto.className}>
         <SessionProvider>
           <NuqsAdapter>
             <Navbar />
             {children}
+            <MobileNav />
           </NuqsAdapter>
         </SessionProvider>
       </body>

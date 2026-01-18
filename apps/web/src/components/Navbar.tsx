@@ -9,8 +9,8 @@ export default async function Navbar() {
   const user = session?.user;
 
   return (
-    <nav className="shadow-lg h-16 fixed w-full bg-secondary z-50 flex items-center px-6 justify-between">
-      {session ? (
+    <nav className="shadow-lg h-16 fixed w-full z-50 flex items-center px-6 justify-between bg-white">
+      {session && (
         <Image
           src={user?.image as string}
           alt={user?.name?.charAt(0) as string}
@@ -18,10 +18,6 @@ export default async function Navbar() {
           height={36}
           className="rounded-full"
         />
-      ) : (
-        <div className="rounded-full size-9 bg-primary/40 content-center text-center">
-          <span>U</span>
-        </div>
       )}
 
       {!session ? (
