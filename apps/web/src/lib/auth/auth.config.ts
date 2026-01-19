@@ -5,4 +5,5 @@ import { type NextAuthConfig } from "next-auth";
 export const authConfig = {
   providers: [Google, Facebook],
   secret: process.env.AUTH_SECRET,
+  trustHost: true,
 } satisfies NextAuthConfig;
