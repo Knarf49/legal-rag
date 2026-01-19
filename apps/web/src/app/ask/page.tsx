@@ -1,10 +1,11 @@
 "use client";
 
+import { Suspense } from "react";
 import { Thread } from "@/components/thread";
 import { StreamProvider } from "@/providers/Stream";
 import { ThreadProvider } from "@/providers/Thread";
 
-export default function AskPage() {
+function AskPageContent() {
   return (
     <ThreadProvider>
       <StreamProvider>
@@ -13,5 +14,13 @@ export default function AskPage() {
         </div>
       </StreamProvider>
     </ThreadProvider>
+  );
+}
+
+export default function AskPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AskPageContent />
+    </Suspense>
   );
 }
