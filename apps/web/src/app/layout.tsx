@@ -14,8 +14,8 @@ const roboto = Roboto({
   display: "swap",
 });
 export const metadata: Metadata = {
-  title: "Agent Inbox",
-  description: "Agent Inbox UX by LangChain",
+  title: "Leganize",
+  description: "AI Meeting summarize platform",
 };
 
 export default function RootLayout({
@@ -29,7 +29,7 @@ export default function RootLayout({
         <SessionProvider>
           <NuqsAdapter>
             <Navbar />
-            <main className="container py-18 border-2 min-h-screen mx-auto px-4">
+            <main className="container py-18 min-h-screen mx-auto px-4">
               {children}
             </main>
             <MobileNav />
