@@ -14,8 +14,22 @@ if (process.env.AUTH_FACEBOOK_ID && process.env.AUTH_FACEBOOK_SECRET) {
   providers.push(Facebook);
 }
 
-export const authConfig = {
+export const authConfig: NextAuthConfig = {
   providers,
   secret: process.env.AUTH_SECRET,
   trustHost: true,
-} satisfies NextAuthConfig;
+  callbacks: {
+    jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
+  },
+};

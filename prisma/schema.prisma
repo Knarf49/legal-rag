@@ -92,7 +92,7 @@ model PollOption {
   id     String @id @default(cuid())
   text   String
   pollId String
-  poll   Poll   @relation(fields: [pollId], references: [id])
+  poll   Poll   @relation(fields: [pollId], references: [id], onDelete: Cascade)
   votes  Vote[]
 
   @@schema("app")
@@ -103,10 +103,32 @@ model Vote {
   userId    String
   pollId    String
   optionId  String
-  poll      Poll       @relation(fields: [pollId], references: [id])
-  option    PollOption @relation(fields: [optionId], references: [id])
+  poll      Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  option    PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
   createdAt DateTime   @default(now())
 
   @@unique([userId, pollId])
+  @@schema("app")
+}
+
+model Node {
+  id     String   @id
+  expiry DateTime
+
+  @@schema("app")
+}
+
+model Outbox {
+  sequenceId Int       @id @default(autoincrement()) @map("sequence_id")
+  mutationId String    @map("mutation_id")
+  channel    String
+  name       String
+  rejected   Boolean   @default(false)
+  data       Json?
+  headers    Json?
+  lockedBy   String?   @map("locked_by")
+  lockExpiry DateTime? @map("lock_expiry")
+  processed  Boolean   @default(false)
+
   @@schema("app")
 }
