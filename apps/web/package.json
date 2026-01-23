@@ -7,7 +7,6 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "build:internal": "next build",
-    "postinstall": "node -e \"try { require('@tailwindcss/oxide'); } catch (e) { console.log('Oxide binaries will be installed...'); }\" || npm install --no-save @tailwindcss/oxide-linux-x64-gnu @tailwindcss/oxide-linux-x64-musl 2>/dev/null || true",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -75,7 +74,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
-    "@tailwindcss/postcss": "^4.0.13",
     "@types/lodash": "^4.17.16",
     "@types/node": "^25.0.10",
     "@types/react": "^19.0.8",
@@ -89,18 +87,13 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
-    "lightningcss-linux-x64-gnu": "^1.29.0",
     "next": "^15.2.3",
     "postcss": "^8.5.3",
-    "tailwind-scrollbar": "^4.0.1",
-    "tailwindcss": "^4.0.13",
+    "tailwind-scrollbar": "^3.1.0",
+    "tailwindcss": "^3.4.17",
     "turbo": "latest",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.22.0"
-  },
-  "optionalDependencies": {
-    "lightningcss-linux-x64-gnu": "^1.29.0",
-    "lightningcss-linux-x64-musl": "^1.29.0"
   },
   "overrides": {
     "react-is": "^19.0.0-rc-69d4b800-20241021"
