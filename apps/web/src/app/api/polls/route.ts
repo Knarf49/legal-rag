@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
 import * as Ably from "ably";
 
 function getAblyClient() {
-  return new Ably.Rest(process.env.NEXT_PUBLIC_ABLY_API_KEY || "");
+  return new Ably.Rest(process.env.ABLY_API_KEY || "");
 }
 
 export async function GET(_: NextRequest) {

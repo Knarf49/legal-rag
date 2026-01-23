@@ -10,7 +10,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Use server-side ABLY_API_KEY (not NEXT_PUBLIC_*)
     const apiKey = process.env.ABLY_API_KEY;
 
     if (!apiKey) {
