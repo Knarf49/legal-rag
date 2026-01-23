@@ -1,0 +1,5 @@
+{
+  "installCommand": "cd ../.. && pnpm install",
+  "buildCommand": "pnpm exec prisma generate --schema=../../prisma/schema.prisma && pnpm exec next build",
+  "framework": "nextjs"
+}
