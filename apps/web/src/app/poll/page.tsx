@@ -1,61 +1,50 @@
 "use client";
 import { PollItems } from "@/components/poll/PollItem";
 import { Button } from "@/components/ui/button";
-import { usePollList } from "@/lib/models/hook";
 import Link from "next/link";
-import Ably from "ably";
-import { AblyProvider } from "ably/react";
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
+import type { PollType } from "@/lib/poll";
 
 export const dynamic = "force-dynamic";
 
-//   mutationId: string,userId: string,question: string,options: string[],
-function PollList() {
-  const [polls, _] = usePollList();
+export default function PollListPage() {
+  const [polls, setPolls] = useState<PollType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  if (!polls) return <div>Loading...</div>;
+  const fetchPolls = async () => {
+    try {
+      const response = await fetch("/api/polls");
+      if (!response.ok) throw new Error("Failed to fetch polls");
+      const { data } = await response.json();
+      setPolls(data);
+    } catch (error) {
+      console.error("Failed to fetch polls:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  if (polls.length === 0) {
-    return (
-      <>
-        <div className="flex items-center justify-center min-h-100">
-          <p className="text-muted-foreground">Not have any poll yet</p>
-        </div>
-      </>
-    );
-  }
+  useEffect(() => {
+    fetchPolls();
+  }, []);
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <div>
       <Link href="/poll/create">
         <Button>Create Poll</Button>
       </Link>
-      {polls.map((poll) => (
-        <PollItems key={poll.id} poll={poll} />
-      ))}
+
+      {polls.length === 0 ? (
+        <div className="flex items-center justify-center min-h-100">
+          <p className="text-muted-foreground">Not have any poll yet</p>
+        </div>
+      ) : (
+        polls.map((poll) => (
+          <PollItems key={poll.id} poll={poll} onVote={fetchPolls} />
+        ))
+      )}
     </div>
-  );
-}
-
-export default function PollListPage() {
-  const client = useMemo(() => {
-    // Only create client on client-side
-    if (typeof window === "undefined") {
-      return null as any;
-    }
-    return new Ably.Realtime({
-      authUrl: "/api/ably/auth",
-      authMethod: "GET",
-    });
-  }, []);
-
-  if (!client) {
-    return <div>Loading...</div>;
-  }
-
-  return (
-    <AblyProvider client={client}>
-      <PollList />
-    </AblyProvider>
   );
 }

@@ -62,8 +62,3 @@ export type Vote = Prisma.VoteModel
  * 
  */
 export type Node = Prisma.NodeModel
-/**
- * Model Outbox
- * 
- */
-export type Outbox = Prisma.OutboxModel

@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import * as runtime from "@prisma/client/runtime/client.js";
-import { Prisma } from "../../generated/prisma/client/client";
 
 export type PollOptionType = {
   id: string;
@@ -187,17 +186,15 @@ async function getPollTx(
  * Create a new poll with options
  */
 export async function createPoll(
-  tx: TxClient,
-  mutationId: string,
   userId: string,
   question: string,
   options: string[],
-): Promise<Prisma.OutboxCreateInput> {
+): Promise<PollType> {
   if (options.length < 2) {
     throw new Error("Poll must have at least 2 options");
   }
 
-  const poll = await tx.poll.create({
+  const poll = await prisma.poll.create({
     data: {
       question,
       options: {
@@ -205,16 +202,26 @@ export async function createPoll(
       },
     },
     include: {
-      options: true,
+      options: {
+        include: {
+          _count: {
+            select: { votes: true },
+          },
+        },
+      },
     },
   });
 
   return {
-    mutationId: mutationId,
-    channel: "poll:list",
-    name: "createPoll",
-    data: poll,
-    headers: {},
+    id: poll.id,
+    question: poll.question,
+    options: poll.options.map((option) => ({
+      id: option.id,
+      text: option.text,
+      voteCount: option._count.votes,
+    })),
+    totalVotes: 0,
+    createdAt: poll.createdAt,
   };
 }
 
@@ -222,22 +229,12 @@ export async function createPoll(
  * Vote on a poll (upsert to handle vote changes)
  */
 export async function vote(
-  tx: TxClient,
-  mutationId: string,
   userId: string,
   pollId: string,
   optionId: string,
-): Promise<Prisma.OutboxCreateInput> {
-  // Verify the option belongs to the poll
-  //   const option = await tx.pollOption.findFirstOrThrow({
-  //     where: {
-  //       id: optionId,
-  //       pollId: pollId,
-  //     },
-  //   });
-
+): Promise<PollType> {
   // Upsert the vote (update if exists, create if not)
-  const vote = await tx.vote.upsert({
+  await prisma.vote.upsert({
     where: {
       userId_pollId: {
         userId,
@@ -255,83 +252,8 @@ export async function vote(
   });
 
   // Get updated poll data with vote counts
-  const poll = await getPollTx(tx, pollId, userId);
-
-  return {
-    mutationId: mutationId,
-    channel: `poll:${pollId}`,
-    name: "vote",
-    data: { vote, poll },
-    headers: {},
-  };
-}
-
-/**
- * Delete a poll (cascades to options and votes)
- */
-export async function deletePoll(
-  tx: TxClient,
-  mutationId: string,
-  id: string,
-): Promise<Prisma.OutboxCreateInput> {
-  const poll = await tx.poll.delete({
-    where: { id },
-  });
-
-  return {
-    mutationId: mutationId,
-    channel: "poll:list",
-    name: "deletePoll",
-    data: poll,
-    headers: {},
-  };
-}
-
-/**
- * Edit poll question and/or options
- */
-export async function editPoll(
-  tx: TxClient,
-  mutationId: string,
-  id: string,
-  question?: string,
-  options?: { id?: string; text: string }[],
-): Promise<Prisma.OutboxCreateInput> {
-  // Verify poll exists
-  await tx.poll.findUniqueOrThrow({ where: { id } });
-
-  // Update question if provided
-  if (question) {
-    await tx.poll.update({
-      where: { id },
-      data: { question },
-    });
-  }
-
-  // Handle options if provided
-  if (options && options.length > 0) {
-    for (const option of options) {
-      if (option.id) {
-        // Update existing option
-        await tx.pollOption.update({
-          where: { id: option.id },
-          data: { text: option.text },
-        });
-      } else {
-        // Create new option
-        await tx.pollOption.create({
-          data: {
-            pollId: id,
-            text: option.text,
-          },
-        });
-      }
-    }
-  }
-
-  // Get updated poll data
-  const poll = await tx.poll.findUniqueOrThrow({
-    where: { id },
+  const poll = await prisma.poll.findUniqueOrThrow({
+    where: { id: pollId },
     include: {
       options: {
         include: {
@@ -340,81 +262,33 @@ export async function editPoll(
           },
         },
       },
+      votes: {
+        where: { userId },
+        select: { optionId: true },
+      },
     },
   });
 
   return {
-    mutationId: mutationId,
-    channel: `poll:${id}`,
-    name: "editPoll",
-    data: poll,
-    headers: {},
+    id: poll.id,
+    question: poll.question,
+    options: poll.options.map((option) => ({
+      id: option.id,
+      text: option.text,
+      voteCount: option._count.votes,
+    })),
+    totalVotes: poll.options.reduce(
+      (sum, option) => sum + option._count.votes,
+      0,
+    ),
+    userVote: poll.votes.length > 0 ? poll.votes[0].optionId : undefined,
+    createdAt: poll.createdAt,
   };
 }
 
-/**
- * Delete a poll option (only if it has no votes)
- */
-export async function deletePollOption(
-  tx: TxClient,
-  mutationId: string,
-  pollId: string,
-  optionId: string,
-): Promise<Prisma.OutboxCreateInput> {
-  // Check if option has votes
-  const voteCount = await tx.vote.count({
-    where: { optionId },
-  });
-
-  if (voteCount > 0) {
-    throw new Error("Cannot delete option that has votes");
-  }
-
-  // Check if poll will have at least 2 options after deletion
-  const optionCount = await tx.pollOption.count({
-    where: { pollId },
-  });
-
-  if (optionCount <= 2) {
-    throw new Error("Poll must have at least 2 options");
-  }
-
-  const option = await tx.pollOption.delete({
-    where: { id: optionId },
-  });
-
-  // Get updated poll data
-  const poll = await getPollTx(tx, pollId);
-
-  return {
-    mutationId: mutationId,
-    channel: `poll:${pollId}`,
-    name: "deletePollOption",
-    data: { option, poll },
-    headers: {},
-  };
-}
-
-/**
- * Wrapper to execute poll operations with outbox pattern
- */
-export async function withOutboxWrite(
-  op: (tx: TxClient, ...args: any[]) => Promise<Prisma.OutboxCreateInput>,
-  ...args: any[]
-) {
-  return await prisma.$transaction(
-    async (tx) => {
-      const { mutationId, channel, name, data, headers } = await op(
-        tx,
-        ...args,
-      );
-      await tx.outbox.create({
-        data: { mutationId, channel, name, data, headers },
-      });
-    },
-    {
-      timeout: 15000, // 15 seconds
-      maxWait: 10000, // 10 seconds to wait for transaction to start
-    },
-  );
-}
+// Removed old outbox-based functions:
+// - deletePoll
+// - editPoll
+// - deletePollOption
+// - withOutboxWrite
+// These are no longer needed after removing Ably real-time updates

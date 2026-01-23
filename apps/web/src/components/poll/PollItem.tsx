@@ -4,15 +4,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PollOption } from "./PollOption";
 import type { PollType } from "@/lib/poll";
-import { vote } from "@/lib/models/mutations";
 import { v4 as uuidv4 } from "uuid";
 import { useSession } from "next-auth/react";
-import { usePoll } from "@/lib/models/hook";
 import { toast } from "react-toastify";
+import { useState } from "react";
 
 type PollItemsProps = {
   poll: PollType;
-  onVote?: (optionId: string) => void;
+  onVote?: () => void;
   showResult?: boolean;
   className?: string;
 };
@@ -23,13 +22,12 @@ export function PollItems({
   showResult = true,
   className,
 }: PollItemsProps) {
-  const [poll, model] = usePoll(initialPoll.id);
+  const [currentPoll, setCurrentPoll] = useState(initialPoll);
+  const [isVoting, setIsVoting] = useState(false);
   const session = useSession();
   const userId = session.data?.user?.id;
   const isSessionLoading = session.status === "loading";
 
-  // Use poll from model if available, otherwise use initial poll
-  const currentPoll = poll || initialPoll;
   const selectedId = currentPoll.userVote ?? null;
 
   const handleVote = async (optionId: string) => {
@@ -38,23 +36,19 @@ export function PollItems({
       return;
     }
 
-    if (!model) {
-      console.warn("Model not ready");
-      return;
-    }
+    if (isVoting) return;
 
+    setIsVoting(true);
     const mutationId = uuidv4();
 
-    // Calculate optimistic update
+    // Optimistic update
     const optimisticPoll: PollType = {
       ...currentPoll,
       userVote: optionId,
       options: currentPoll.options.map((opt) => {
         if (opt.id === optionId) {
-          // Increase vote count for new selection
           return { ...opt, voteCount: opt.voteCount + 1 };
         } else if (opt.id === selectedId) {
-          // Decrease vote count for previous selection
           return { ...opt, voteCount: Math.max(0, opt.voteCount - 1) };
         }
         return opt;
@@ -65,20 +59,34 @@ export function PollItems({
           : currentPoll.totalVotes,
     };
 
-    const [confirmed, cancel] = await model.optimistic({
-      mutationId,
-      name: "vote",
-      data: { poll: optimisticPoll },
-    });
+    setCurrentPoll(optimisticPoll);
 
     try {
-      await vote(mutationId, userId, currentPoll.id, optionId);
-      await confirmed;
-      onVote?.(optionId);
+      const response = await fetch(`/api/polls/${currentPoll.id}/vote`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ optionId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to vote");
+      }
+
+      // Refresh from server
+      const pollResponse = await fetch(`/api/polls/${currentPoll.id}`);
+      if (pollResponse.ok) {
+        const { data } = await pollResponse.json();
+        setCurrentPoll(data);
+      }
+
+      onVote?.();
     } catch (error) {
       console.error("Failed to vote:", error);
       toast.error(error instanceof Error ? error.message : "Failed to vote");
-      cancel();
+      // Revert optimistic update
+      setCurrentPoll(initialPoll);
+    } finally {
+      setIsVoting(false);
     }
   };
 
@@ -103,7 +111,7 @@ export function PollItems({
               votes={option.voteCount}
               percentage={percentage}
               selected={selectedId === option.id}
-              disabled={!model || !userId || isSessionLoading}
+              disabled={isVoting || !userId || isSessionLoading}
               showResult={showResult}
               onSelect={handleVote}
             />

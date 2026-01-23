@@ -392,8 +392,7 @@ export const ModelName = {
   Poll: 'Poll',
   PollOption: 'PollOption',
   Vote: 'Vote',
-  Node: 'Node',
-  Outbox: 'Outbox'
+  Node: 'Node'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -409,7 +408,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verificationToken" | "authenticator" | "poll" | "pollOption" | "vote" | "node" | "outbox"
+    modelProps: "user" | "account" | "session" | "verificationToken" | "authenticator" | "poll" | "pollOption" | "vote" | "node"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1079,80 +1078,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    Outbox: {
-      payload: Prisma.$OutboxPayload<ExtArgs>
-      fields: Prisma.OutboxFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.OutboxFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.OutboxFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxPayload>
-        }
-        findFirst: {
-          args: Prisma.OutboxFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.OutboxFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxPayload>
-        }
-        findMany: {
-          args: Prisma.OutboxFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxPayload>[]
-        }
-        create: {
-          args: Prisma.OutboxCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxPayload>
-        }
-        createMany: {
-          args: Prisma.OutboxCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.OutboxCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxPayload>[]
-        }
-        delete: {
-          args: Prisma.OutboxDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxPayload>
-        }
-        update: {
-          args: Prisma.OutboxUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxPayload>
-        }
-        deleteMany: {
-          args: Prisma.OutboxDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.OutboxUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.OutboxUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxPayload>[]
-        }
-        upsert: {
-          args: Prisma.OutboxUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$OutboxPayload>
-        }
-        aggregate: {
-          args: Prisma.OutboxAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateOutbox>
-        }
-        groupBy: {
-          args: Prisma.OutboxGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.OutboxGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.OutboxCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.OutboxCountAggregateOutputType> | number
-        }
-      }
-    }
   }
 } & {
   other: {
@@ -1295,36 +1220,12 @@ export const NodeScalarFieldEnum = {
 export type NodeScalarFieldEnum = (typeof NodeScalarFieldEnum)[keyof typeof NodeScalarFieldEnum]
 
 
-export const OutboxScalarFieldEnum = {
-  sequenceId: 'sequenceId',
-  mutationId: 'mutationId',
-  channel: 'channel',
-  name: 'name',
-  rejected: 'rejected',
-  data: 'data',
-  headers: 'headers',
-  lockedBy: 'lockedBy',
-  lockExpiry: 'lockExpiry',
-  processed: 'processed'
-} as const
-
-export type OutboxScalarFieldEnum = (typeof OutboxScalarFieldEnum)[keyof typeof OutboxScalarFieldEnum]
-
-
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
-
-
-export const NullableJsonNullValueInput = {
-  DbNull: DbNull,
-  JsonNull: JsonNull
-} as const
-
-export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -1341,15 +1242,6 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
-export const JsonNullValueFilter = {
-  DbNull: DbNull,
-  JsonNull: JsonNull,
-  AnyNull: AnyNull
-} as const
-
-export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -1404,20 +1296,6 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-/**
- * Reference to a field of type 'Json'
- */
-export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-/**
- * Reference to a field of type 'QueryMode'
- */
-export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -1538,7 +1416,6 @@ export type GlobalOmitConfig = {
   pollOption?: Prisma.PollOptionOmit
   vote?: Prisma.VoteOmit
   node?: Prisma.NodeOmit
-  outbox?: Prisma.OutboxOmit
 }
 
 /* Types for Logging */

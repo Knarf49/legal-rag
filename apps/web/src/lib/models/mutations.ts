@@ -1,17 +1,10 @@
-import { ConfirmedEvent, OptimisticEvent } from "@ably-labs/models";
-import cloneDeep from "lodash/cloneDeep";
 import type { PollType } from "@/lib/poll";
-//TODO: Add get function
-export async function createPoll(
-  mutationId: string,
-  userId: string,
-  question: string,
-  options: string[],
-) {
+
+export async function createPoll(question: string, options: string[]) {
   const response = await fetch("/api/polls", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mutationId, userId, question, options }),
+    body: JSON.stringify({ question, options }),
   });
   if (!response.ok)
     throw new Error(
@@ -23,16 +16,11 @@ export async function createPoll(
 /**
  * Vote on a poll
  */
-export async function vote(
-  mutationId: string,
-  userId: string,
-  pollId: string,
-  optionId: string,
-) {
+export async function vote(pollId: string, optionId: string) {
   const response = await fetch(`/api/polls/${pollId}/vote`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mutationId, userId, optionId }),
+    body: JSON.stringify({ optionId }),
   });
   if (!response.ok)
     throw new Error(
