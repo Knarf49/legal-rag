@@ -7,6 +7,8 @@ import Ably from "ably";
 import { AblyProvider } from "ably/react";
 import { useMemo } from "react";
 
+export const dynamic = "force-dynamic";
+
 //   mutationId: string,userId: string,question: string,options: string[],
 function PollList() {
   const [polls, _] = usePollList();
@@ -36,13 +38,19 @@ function PollList() {
 }
 
 export default function PollListPage() {
-  const client = useMemo(
-    () =>
-      new Ably.Realtime({
-        key: process.env.NEXT_PUBLIC_ABLY_API_KEY,
-      }),
-    [],
-  );
+  const client = useMemo(() => {
+    // Only create client on client-side
+    if (typeof window === "undefined") {
+      return null as any;
+    }
+    return new Ably.Realtime({
+      key: process.env.NEXT_PUBLIC_ABLY_API_KEY,
+    });
+  }, []);
+
+  if (!client) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <AblyProvider client={client}>
