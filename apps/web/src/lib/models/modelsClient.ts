@@ -6,7 +6,10 @@ import { Realtime } from "ably";
 let client: ModelsClient;
 
 export const modelsClient = () => {
-  const ably = new Realtime({ key: process.env.ABLY_API_KEY });
+  const ably = new Realtime({
+    authUrl: "/api/ably/auth",
+    authMethod: "GET",
+  });
   if (!client) client = new ModelsClient({ ably });
   return client;
 };
