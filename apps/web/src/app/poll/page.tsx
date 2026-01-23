@@ -5,6 +5,7 @@ import { usePollList } from "@/lib/models/hook";
 import Link from "next/link";
 import Ably from "ably";
 import { AblyProvider } from "ably/react";
+import { useMemo } from "react";
 
 //   mutationId: string,userId: string,question: string,options: string[],
 function PollList() {
@@ -35,9 +36,13 @@ function PollList() {
 }
 
 export default function PollListPage() {
-  const client = new Ably.Realtime({
-    key: process.env.NEXT_PUBLIC_ABLY_API_KEY,
-  });
+  const client = useMemo(
+    () =>
+      new Ably.Realtime({
+        key: process.env.NEXT_PUBLIC_ABLY_API_KEY,
+      }),
+    [],
+  );
 
   return (
     <AblyProvider client={client}>
