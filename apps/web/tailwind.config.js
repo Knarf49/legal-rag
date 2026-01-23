@@ -6,6 +6,7 @@ module.exports = {
     "./src/**/*.{ts,tsx,js,jsx}",
     "./agent/**/*.{ts,tsx,js,jsx}",
   ],
+  plugins: [require("tailwindcss-animate")],
   theme: {
     extend: {
       borderRadius: {
