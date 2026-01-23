@@ -7,7 +7,9 @@ import { auth } from "@/lib/auth/auth-node";
 import { prisma } from "@/lib/prisma";
 import * as Ably from "ably";
 
-const ably = new Ably.Rest(process.env.NEXT_PUBLIC_ABLY_API_KEY || "");
+function getAblyClient() {
+  return new Ably.Rest(process.env.NEXT_PUBLIC_ABLY_API_KEY || "");
+}
 
 export async function GET(_: NextRequest) {
   try {
@@ -54,6 +56,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (latestEntry) {
+      const ably = getAblyClient();
       const channel = ably.channels.get(latestEntry.channel);
       await channel.publish(latestEntry.name, latestEntry.data);
 
