@@ -5,7 +5,7 @@ import ws from "ws";
 // import { withAccelerate } from "@prisma/extension-accelerate";
 
 declare global {
-  var prisma: typeof PrismaClient | undefined;
+  var prisma: PrismaClient | undefined;
 }
 
 // Validate DATABASE_URL is set
@@ -17,7 +17,7 @@ neonConfig.webSocketConstructor = ws;
 // const pool = new Pool({ connectionString: databaseUrl });
 const adapter = new PrismaNeon({ connectionString: databaseUrl });
 
-export const prisma=
+export const prisma =
   global.prisma ||
   new PrismaClient({
     adapter,
