@@ -4,7 +4,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import * as Ably from "ably";
 
-const ably = new Ably.Rest(process.env.NEXT_PUBLIC_ABLY_API_KEY || "");
+function getAblyClient() {
+  return new Ably.Rest(process.env.NEXT_PUBLIC_ABLY_API_KEY || "");
+}
 
 export async function POST(
   request: NextRequest,
@@ -37,6 +39,8 @@ export async function POST(
     });
 
     if (latestEntry) {
+      const ably = getAblyClient();
+
       // Publish to individual poll channel
       const pollChannel = ably.channels.get(latestEntry.channel);
       await pollChannel.publish(latestEntry.name, latestEntry.data);
