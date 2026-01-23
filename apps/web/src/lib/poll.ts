@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import * as runtime from "@prisma/client/runtime/client.js";
-import { Prisma, PrismaClient } from "../../generated/prisma/client/client";
+import { Prisma } from "../../generated/prisma/client/client";
 
 export type PollOptionType = {
   id: string;
@@ -17,7 +17,7 @@ export type PollType = {
   createdAt: Date;
 };
 
-export type TxClient = Omit<PrismaClient, runtime.ITXClientDenyList>;
+export type TxClient = Omit<typeof prisma, runtime.ITXClientDenyList>;
 
 /**
  * Get all polls with vote counts
