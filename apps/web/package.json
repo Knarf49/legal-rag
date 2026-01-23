@@ -7,6 +7,7 @@
     "dev": "next dev",
     "build": "cd ../.. && npx prisma generate --schema=./prisma/schema.prisma && cd apps/web && npx next build",
     "build:internal": "next build",
+    "postinstall": "node -e \"try{require('@tailwindcss/oxide')}catch(e){const{execSync}=require('child_process');try{execSync('npm install --no-save @tailwindcss/oxide-linux-x64-gnu @tailwindcss/oxide-linux-x64-musl',{stdio:'inherit'})}catch(err){console.log('Oxide install skipped')}}\"",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
