@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "cd ../.. && npx prisma generate --schema=./prisma/schema.prisma && cd apps/web && npx next build",
     "build:internal": "next build",
     "start": "next start",
     "lint": "next lint",
