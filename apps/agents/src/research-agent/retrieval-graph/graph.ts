@@ -41,7 +41,10 @@ async function analyzeAndRouteQuery(
     logic: string;
     type: "more-info" | "law" | "shareholder-meeting" | "general";
   };
-  return { router: response };
+  return {
+    router: response,
+    messages: [...state.messages],
+  };
 }
 
 function routeQuery(
